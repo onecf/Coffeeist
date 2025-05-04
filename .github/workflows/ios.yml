@@ -1,0 +1,21 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+    - name: Build
+      run: |
+        xcodebuild clean build -project Coffeeist.xcodeproj -scheme Coffeeist -destination "platform=iOS Simulator,name=iPhone 14 Pro" 
