@@ -12,10 +12,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
     - name: Set up Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
+    
+    - name: List Xcode schemes
+      run: xcodebuild -list -project Coffeeist.xcodeproj || xcodebuild -list -workspace Coffeeist.xcworkspace
+    
     - name: Build
       run: |
-        xcodebuild clean build -project Coffeeist.xcodeproj -scheme Coffeeist -destination "platform=iOS Simulator,name=iPhone 14 Pro" 
+        # Try to build with project file first
+        xcodebuild clean build -project Coffeeist.xcodeproj -scheme Coffeeist -destination "platform=iOS Simulator,name=iPhone 14" || \
+        # If that fails, try with workspace
+        xcodebuild clean build -workspace Coffeeist.xcworkspace -scheme Coffeeist -destination "platform=iOS Simulator,name=iPhone 14" 
