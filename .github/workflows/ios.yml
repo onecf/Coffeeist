@@ -18,12 +18,10 @@ jobs:
       with:
         xcode-version: latest-stable
     
-    - name: List Xcode schemes
-      run: xcodebuild -list -project Coffeeist.xcodeproj || xcodebuild -list -workspace Coffeeist.xcworkspace
+    - name: List available destinations
+      run: xcodebuild -project Coffeeist.xcodeproj -scheme Coffeeist -showdestinations
     
     - name: Build
       run: |
-        # Try to build with project file first
-        xcodebuild clean build -project Coffeeist.xcodeproj -scheme Coffeeist -destination "platform=iOS Simulator,name=iPhone 14" || \
-        # If that fails, try with workspace
-        xcodebuild clean build -workspace Coffeeist.xcworkspace -scheme Coffeeist -destination "platform=iOS Simulator,name=iPhone 14" 
+        # Use a generic simulator specification
+        xcodebuild clean build -project Coffeeist.xcodeproj -scheme Coffeeist -destination "platform=iOS Simulator,name=Any iOS Simulator Device" 
