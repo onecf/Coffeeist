@@ -61,6 +61,9 @@ struct PreparationFormView: View {
     @State private var showingGrinderBrandPicker = false
     @State private var showingEspressoMachinePicker = false
     
+    @State private var grinderSuggestions: [String] = []
+    @State private var espressoMachineSuggestions: [String] = []
+    
     var body: some View {
         Form {
             // 1. PREPARATION PARAMETERS SECTION
@@ -418,6 +421,8 @@ struct PreparationFormView: View {
         let imageData = coffeeImage?.jpegData(compressionQuality: 0.7)
         
         let newPreparation = CoffeePreparation(
+            id: UUID(), // Generate a new UUID
+            date: Date(), // Use current date
             coffeeBrand: coffeeBrand,
             coffeeOrigin: coffeeOrigin,
             coffeeRoastLevel: coffeeRoastLevel,
@@ -491,11 +496,26 @@ struct PreparationFormView: View {
         
         dataManager.updatePreparation(updatedPreparation)
     }
+    
+    private func fetchGrinderSuggestions() {
+        guard !grinderBrand.isEmpty else {
+            grinderSuggestions = []
+            return
+        }
+        
+        dataManager.getEquipmentSuggestions(type: "grinder", prefix: grinderBrand) { suggestions in
+            DispatchQueue.main.async {
+                self.grinderSuggestions = suggestions
+            }
+        }
+    }
 }
 
-#Preview {
-    NavigationStack {
-        PreparationFormView()
-            .environmentObject(PreparationDataManager())
+struct PreparationFormView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationStack {
+            PreparationFormView()
+                .environmentObject(PreparationDataManager(databaseService: MockDatabaseService()))
+        }
     }
 } 

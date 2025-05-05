@@ -1,0 +1,2 @@
+rm Coffeeist/Models/CoffeePreparation.swift 
+rm Coffeeist/Models/PreparationDataManager.swift 

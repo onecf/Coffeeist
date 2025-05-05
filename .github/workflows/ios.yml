@@ -18,10 +18,9 @@ jobs:
       with:
         xcode-version: latest-stable
     
-    - name: List available destinations
-      run: xcodebuild -project Coffeeist.xcodeproj -scheme Coffeeist -showdestinations
+    - name: List schemes
+      run: xcodebuild -list -project Coffeeist.xcodeproj
     
     - name: Build
       run: |
-        # Use a generic simulator specification
-        xcodebuild clean build -project Coffeeist.xcodeproj -scheme Coffeeist -destination "platform=iOS Simulator,name=Any iOS Simulator Device" 
+        xcodebuild build -project Coffeeist.xcodeproj -scheme Coffeeist CODE_SIGNING_ALLOWED=NO 

@@ -13,49 +13,56 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // Header with date and greeting
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(formattedDate)
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                    
-                    Text("Good morning, Juan!")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(Color(.systemBackground))
-                
-                // Timeline or empty state
-                if dataManager.preparations.isEmpty {
-                    ContentUnavailableView(
-                        "No Coffee Preparations Yet",
-                        systemImage: "cup.and.saucer",
-                        description: Text("Tap the button below to log your first coffee preparation.")
-                    )
+            ZStack {
+                VStack(spacing: 0) {
+                    // Header with date and greeting
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(formattedDate)
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                        
+                        Text("Good morning, Juan!")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
-                    Spacer()
-                } else {
-                    TimelineView()
+                    .background(Color(.systemBackground))
+                    
+                    // Timeline or empty state
+                    if dataManager.preparations.isEmpty {
+                        ContentUnavailableView(
+                            "No Coffee Preparations Yet",
+                            systemImage: "cup.and.saucer",
+                            description: Text("Tap the button below to log your first coffee preparation.")
+                        )
+                        .padding()
+                        Spacer()
+                    } else {
+                        TimelineView()
+                    }
+                    
+                    // Add prominent CTA button at the bottom
+                    Button(action: {
+                        showingNewPreparationForm = true
+                    }) {
+                        Label("Log New Preparation", systemImage: "plus.circle.fill")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.brown)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 12)
+                    .background(Color(.systemBackground))
                 }
                 
-                // Add prominent CTA button at the bottom
-                Button(action: {
-                    showingNewPreparationForm = true
-                }) {
-                    Label("Log New Preparation", systemImage: "plus.circle.fill")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.brown)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+                // Loading overlay
+                if dataManager.isLoading {
+                    LoadingView()
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 12)
-                .background(Color(.systemBackground))
             }
             .navigationTitle("Coffeeist")
             .navigationBarTitleDisplayMode(.inline)
@@ -75,6 +82,9 @@ struct ContentView: View {
                 }
                 .presentationDetents([.large])
             }
+            .alert(item: $dataManager.alertItem) { alertItem in
+                alertItem.alert
+            }
         }
     }
     
@@ -85,7 +95,9 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
-        .environmentObject(PreparationDataManager())
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+            .environmentObject(PreparationDataManager(databaseService: MockDatabaseService()))
+    }
 }

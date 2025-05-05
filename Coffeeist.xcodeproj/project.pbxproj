@@ -6,6 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		835C74FF2DC8433F008BC273 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 835C74FE2DC8433F008BC273 /* FirebaseAnalytics */; };
+		835C75012DC8433F008BC273 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 835C75002DC8433F008BC273 /* FirebaseAuth */; };
+		835C75032DC8433F008BC273 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 835C75022DC8433F008BC273 /* FirebaseDatabase */; };
+		835C75052DC8433F008BC273 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 835C75042DC8433F008BC273 /* FirebaseFirestore */; };
+		835C75072DC8433F008BC273 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 835C75062DC8433F008BC273 /* FirebaseStorage */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		838220DC2DC70C1C002A3263 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -29,9 +37,24 @@
 		838220E52DC70C1C002A3263 /* CoffeeistUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CoffeeistUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		835C75582DC8724D008BC273 /* Exceptions for "Coffeeist" folder in "Coffeeist" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				Models/CoffeePreparation.swift,
+				Models/PreparationDataManager.swift,
+			);
+			target = 838220CD2DC70C19002A3263 /* Coffeeist */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		838220D02DC70C19002A3263 /* Coffeeist */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				835C75582DC8724D008BC273 /* Exceptions for "Coffeeist" folder in "Coffeeist" target */,
+			);
 			path = Coffeeist;
 			sourceTree = "<group>";
 		};
@@ -52,6 +75,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				835C75032DC8433F008BC273 /* FirebaseDatabase in Frameworks */,
+				835C75052DC8433F008BC273 /* FirebaseFirestore in Frameworks */,
+				835C74FF2DC8433F008BC273 /* FirebaseAnalytics in Frameworks */,
+				835C75072DC8433F008BC273 /* FirebaseStorage in Frameworks */,
+				835C75012DC8433F008BC273 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +140,11 @@
 			);
 			name = Coffeeist;
 			packageProductDependencies = (
+				835C74FE2DC8433F008BC273 /* FirebaseAnalytics */,
+				835C75002DC8433F008BC273 /* FirebaseAuth */,
+				835C75022DC8433F008BC273 /* FirebaseDatabase */,
+				835C75042DC8433F008BC273 /* FirebaseFirestore */,
+				835C75062DC8433F008BC273 /* FirebaseStorage */,
 			);
 			productName = Coffeeist;
 			productReference = 838220CE2DC70C19002A3263 /* Coffeeist.app */;
@@ -195,6 +228,9 @@
 			);
 			mainGroup = 838220C52DC70C19002A3263;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				835C74FD2DC8433F008BC273 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 838220CF2DC70C19002A3263 /* Products */;
 			projectDirPath = "";
@@ -322,6 +358,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = Coffeeist/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -380,6 +417,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = Coffeeist/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -399,7 +437,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LUNR4Z57FL;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Coffeeist/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -427,7 +466,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LUNR4Z57FL;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Coffeeist/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -558,6 +598,45 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		835C74FD2DC8433F008BC273 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		835C74FE2DC8433F008BC273 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 835C74FD2DC8433F008BC273 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		835C75002DC8433F008BC273 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 835C74FD2DC8433F008BC273 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		835C75022DC8433F008BC273 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 835C74FD2DC8433F008BC273 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		835C75042DC8433F008BC273 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 835C74FD2DC8433F008BC273 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		835C75062DC8433F008BC273 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 835C74FD2DC8433F008BC273 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 838220C62DC70C19002A3263 /* Project object */;
 }

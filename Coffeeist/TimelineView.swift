@@ -297,5 +297,5 @@ struct DetailRow: View {
 
 #Preview {
     TimelineView()
-        .environmentObject(PreparationDataManager())
+        .environmentObject(PreparationDataManager(databaseService: MockDatabaseService()))
 } 

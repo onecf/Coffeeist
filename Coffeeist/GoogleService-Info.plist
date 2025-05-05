@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyANh6K2PWIK8l386ZVFzgb1SElSFXw4U9g</string>
+	<key>GCM_SENDER_ID</key>
+	<string>621549529174</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.afloatai.Coffeeist</string>
+	<key>PROJECT_ID</key>
+	<string>coffeeist</string>
+	<key>STORAGE_BUCKET</key>
+	<string>coffeeist.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:621549529174:ios:3babd0969969121d4eb3f7</string>
+</dict>
+</plist>
