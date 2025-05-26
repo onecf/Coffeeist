@@ -48,6 +48,7 @@ This document provides an overview of all files and directories in the Coffeeist
 | `.gitignore` | Specifies files that should not be tracked by Git version control. |
 | `README.md` | Overview documentation about the project, including setup instructions. |
 | `PrivacyPolicy.md` | The app's privacy policy for users and App Store submission. |
+| `DATABASE_SCHEMA.md` | Comprehensive documentation of the Firebase Firestore database structure and schema. |
 | `Coffeeist.xcodeproj/` | Xcode project files that define how to build the app. |
 | `.github/workflows/ios.yml` | GitHub Actions workflow configuration for continuous integration testing. |
 | `CoffeeistTests/` | Directory containing unit tests for the app's logic. |
