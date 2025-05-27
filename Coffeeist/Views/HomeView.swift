@@ -1,15 +1,12 @@
-//
-//  ContentView.swift
-//  Coffeeist
-//
-//  Created by Juan Colmenares on 5/3/25.
-//
-
 import SwiftUI
 
-struct ContentView: View {
+struct HomeView: View {
+    @EnvironmentObject private var authService: AuthenticationService
+    @EnvironmentObject private var databaseService: DatabaseService
+    @State private var preparations: [Preparation] = []
+    @State private var isLoading = false
     @State private var showingNewPreparationForm = false
-    @EnvironmentObject private var dataManager: PreparationDataManager
+    @State private var errorMessage: String?
     
     var body: some View {
         NavigationStack {
@@ -21,7 +18,7 @@ struct ContentView: View {
                             .font(.headline)
                             .foregroundStyle(.secondary)
                         
-                        Text("Good morning, Juan!")
+                        Text("Good morning, \(authService.currentUser?.displayName ?? "Coffee Lover")!")
                             .font(.largeTitle)
                             .fontWeight(.bold)
                     }
@@ -30,7 +27,7 @@ struct ContentView: View {
                     .background(Color(.systemBackground))
                     
                     // Timeline or empty state
-                    if dataManager.preparations.isEmpty {
+                    if preparations.isEmpty && !isLoading {
                         ContentUnavailableView(
                             "No Coffee Preparations Yet",
                             systemImage: "cup.and.saucer",
@@ -39,7 +36,7 @@ struct ContentView: View {
                         .padding()
                         Spacer()
                     } else {
-                        TimelineView()
+                        PreparationTimelineView(preparations: preparations)
                     }
                     
                     // Add prominent CTA button at the bottom
@@ -60,7 +57,7 @@ struct ContentView: View {
                 }
                 
                 // Loading overlay
-                if dataManager.isLoading {
+                if isLoading {
                     LoadingView()
                 }
             }
@@ -78,12 +75,24 @@ struct ContentView: View {
             }
             .sheet(isPresented: $showingNewPreparationForm) {
                 NavigationStack {
-                    PreparationFormView(editMode: false)
+                    NewPreparationFormView()
                 }
                 .presentationDetents([.large])
             }
-            .alert(item: $dataManager.alertItem) { alertItem in
-                alertItem.alert
+            .task {
+                await loadPreparations()
+            }
+            .refreshable {
+                await loadPreparations()
+            }
+            .alert("Error", isPresented: .constant(errorMessage != nil)) {
+                Button("OK") {
+                    errorMessage = nil
+                }
+            } message: {
+                if let errorMessage = errorMessage {
+                    Text(errorMessage)
+                }
             }
         }
     }
@@ -93,11 +102,24 @@ struct ContentView: View {
         formatter.dateStyle = .full
         return formatter.string(from: Date())
     }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-            .environmentObject(PreparationDataManager(databaseService: MockDatabaseService()))
+    
+    private func loadPreparations() async {
+        guard let userId = authService.currentUser?.uid else { return }
+        
+        isLoading = true
+        
+        do {
+            preparations = try await databaseService.getUserPreparations(userId: userId, limit: 10)
+        } catch {
+            errorMessage = "Failed to load preparations: \(error.localizedDescription)"
+        }
+        
+        isLoading = false
     }
 }
+
+#Preview {
+    HomeView()
+        .environmentObject(AuthenticationService())
+        .environmentObject(DatabaseService())
+} 

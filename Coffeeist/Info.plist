@@ -57,5 +57,16 @@
     <string>Coffeeist needs access to your camera to take photos of your coffee preparations.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Coffeeist needs access to your photo library to select photos of your coffee preparations.</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+    <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+        <string>com.googleusercontent.apps.621549529174-evpflohktc9itkilrakrnk0s5o49d90g</string>
+        </array>
+    </dict>
+    </array>
 </dict>
 </plist>

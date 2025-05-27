@@ -1,6 +1,7 @@
 import Foundation
 import UIKit
 
+// LEGACY MODEL - To be removed after migration
 struct CoffeePreparation: Identifiable, Codable {
     var id = UUID()
     var date = Date()

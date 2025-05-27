@@ -20,13 +20,20 @@ struct CoffeeistApp: App {
     // Register app delegate for Firebase setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
-    // Use the data manager as an environment object
-    @StateObject private var dataManager = PreparationDataManager()
+    // Use the new services
+    @StateObject private var authService = AuthenticationService()
+    @StateObject private var databaseService = DatabaseService()
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(dataManager)
+            if authService.isAuthenticated {
+                MainTabView()
+                    .environmentObject(authService)
+                    .environmentObject(databaseService)
+            } else {
+                AuthenticationView()
+                    .environmentObject(authService)
+            }
         }
     }
 }

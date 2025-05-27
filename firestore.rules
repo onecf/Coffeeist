@@ -1,0 +1,144 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidUser() {
+      return isAuthenticated() && 
+             request.resource.data.uid == request.auth.uid;
+    }
+    
+    // User profiles - users can manage their own profile, read public profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated() && 
+                     (request.auth.uid == userId || resource.data.isPublic == true);
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == userId &&
+                       request.resource.data.uid == request.auth.uid &&
+                       request.resource.data.keys().hasAll(['uid', 'email', 'displayName']);
+      allow update: if isAuthenticated() && 
+                       request.auth.uid == userId &&
+                       request.resource.data.uid == resource.data.uid; // Prevent UID changes
+    }
+    
+    // Coffee beans - authenticated users can read all, create new ones, update their own
+    match /coffee_beans/{beanId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                       request.resource.data.createdBy == request.auth.uid &&
+                       request.resource.data.keys().hasAll(['brand', 'name', 'origin', 'roastLevel']);
+      allow update: if isAuthenticated() && 
+                       resource.data.createdBy == request.auth.uid;
+    }
+    
+    // Equipment - authenticated users can read all, create new ones, update their own
+    match /equipment/{equipmentId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                       request.resource.data.createdBy == request.auth.uid &&
+                       request.resource.data.keys().hasAll(['type', 'brand', 'model']);
+      allow update: if isAuthenticated() && 
+                       resource.data.createdBy == request.auth.uid;
+    }
+    
+    // Brewing methods - read-only for users (admin-managed)
+    match /brewing_methods/{methodId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Admin-only via server SDK
+    }
+    
+    // User setups - users can manage their own, read public ones
+    match /user_setups/{setupId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || resource.data.isPublic == true);
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.keys().hasAll(['userId', 'name', 'brewingMethodId']);
+      allow update, delete: if isAuthenticated() && 
+                               resource.data.userId == request.auth.uid;
+    }
+    
+    // User coffee inventory - users can only manage their own
+    match /user_coffee_inventory/{inventoryId} {
+      allow read, write: if isAuthenticated() && 
+                            resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+    }
+    
+    // User coffee wishlist - users can only manage their own
+    match /user_coffee_wishlist/{wishlistId} {
+      allow read, write: if isAuthenticated() && 
+                            resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+    }
+    
+    // User equipment owned - users can only manage their own
+    match /user_equipment_owned/{ownedId} {
+      allow read, write: if isAuthenticated() && 
+                            resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Preparations - users can manage their own, read public ones
+    match /preparations/{preparationId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || resource.data.isPublic == true);
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.keys().hasAll(['userId', 'coffeeBeanId', 'brewingMethodId']);
+      allow update, delete: if isAuthenticated() && 
+                               resource.data.userId == request.auth.uid;
+    }
+    
+    // Follow relationships - users can manage their own follows, read all
+    match /follows/{followId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                       request.resource.data.follower == request.auth.uid &&
+                       request.resource.data.keys().hasAll(['follower', 'following']);
+      allow delete: if isAuthenticated() && 
+                       resource.data.follower == request.auth.uid;
+    }
+    
+    // Clubs - read public clubs, manage own clubs
+    match /clubs/{clubId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.isPublic == true || resource.data.createdBy == request.auth.uid);
+      allow create: if isAuthenticated() && 
+                       request.resource.data.createdBy == request.auth.uid &&
+                       request.resource.data.keys().hasAll(['name', 'description', 'createdBy']);
+      allow update, delete: if isAuthenticated() && 
+                               resource.data.createdBy == request.auth.uid;
+    }
+    
+    // Club memberships - users can manage their own memberships
+    match /club_memberships/{membershipId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && 
+                               resource.data.userId == request.auth.uid;
+    }
+    
+    // Brand pages - read all, manage own
+    match /brand_pages/{brandId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                       request.resource.data.ownerId == request.auth.uid &&
+                       request.resource.data.keys().hasAll(['name', 'description', 'ownerId']);
+      allow update, delete: if isAuthenticated() && 
+                               resource.data.ownerId == request.auth.uid;
+    }
+  }
+}

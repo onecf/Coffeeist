@@ -42,8 +42,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				Models/CoffeePreparation.swift,
-				Models/PreparationDataManager.swift,
 			);
 			target = 838220CD2DC70C19002A3263 /* Coffeeist */;
 		};
