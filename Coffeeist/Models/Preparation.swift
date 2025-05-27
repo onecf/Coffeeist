@@ -119,42 +119,4 @@ struct CoffeeCharacteristics: Codable {
         let total = bitterness + acidity + sweetness + body + crema + aroma + aftertaste
         return Double(total) / 7.0
     }
-}
-
-// Extension for backward compatibility with legacy CoffeePreparation
-// Note: This will be removed after migration is complete
-extension Preparation {
-    static func fromLegacy(_ legacy: CoffeePreparation, userId: String, coffeeBeanId: String, brewingMethodId: String) -> Preparation {
-        let measurements = PreparationMeasurements(
-            grindSize: legacy.grindSize,
-            grindingTime: legacy.grindingTime,
-            groundCoffeeWeight: legacy.groundCoffeeWeight,
-            preInfusionTime: legacy.preInfusionTime,
-            extractionTime: legacy.extractionTime,
-            yieldWeight: legacy.yieldWeight
-        )
-        
-        let characteristics = CoffeeCharacteristics(
-            bitterness: legacy.bitterness,
-            acidity: legacy.acidity,
-            sweetness: legacy.sweetness,
-            body: legacy.body,
-            crema: legacy.crema,
-            aroma: legacy.aroma,
-            aftertaste: legacy.aftertaste
-        )
-        
-        return Preparation(
-            userId: userId,
-            coffeeBeanId: coffeeBeanId,
-            brewingMethodId: brewingMethodId,
-            date: legacy.date,
-            measurements: measurements,
-            preparationRating: legacy.rating,
-            coffeeBeanRating: legacy.rating, // Use same rating for both initially
-            characteristics: characteristics,
-            notes: legacy.notes,
-            isPublic: true
-        )
-    }
 } 
