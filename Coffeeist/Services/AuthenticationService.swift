@@ -41,6 +41,9 @@ class AuthenticationService: ObservableObject {
                 self.currentUser = user
                 self.isAuthenticated = true
                 print("✅ Successfully loaded user profile for: \(user.displayName)")
+                
+                // Check if this user needs username migration (update the document in Firestore)
+                await migrateUserIfNeeded(user: user)
             } else {
                 // User exists in Firebase Auth but not in our database
                 // This might happen during the migration period or for existing users
@@ -54,11 +57,25 @@ class AuthenticationService: ObservableObject {
         }
     }
     
+    private func migrateUserIfNeeded(user: User) async {
+        // If the username was auto-generated during decoding, update the Firestore document
+        // This ensures the username field is persisted for future loads
+        do {
+            try await databaseService.updateUser(user)
+            print("✅ User migration completed: username field added to Firestore")
+        } catch {
+            print("⚠️ Failed to migrate user document: \(error.localizedDescription)")
+            // Don't fail the login process if migration fails
+        }
+    }
+    
     private func createUserProfile(from firebaseUser: FirebaseAuth.User) async {
+        let defaultDisplayName = firebaseUser.displayName ?? "Coffee Lover"
         let user = User(
             uid: firebaseUser.uid,
             email: firebaseUser.email ?? "",
-            displayName: firebaseUser.displayName ?? "Coffee Lover",
+            displayName: defaultDisplayName,
+            username: nil, // Will auto-generate from displayName
             profileImageURL: firebaseUser.photoURL?.absoluteString
         )
         
@@ -70,6 +87,7 @@ class AuthenticationService: ObservableObject {
             // Seed default data for existing users
             try await databaseService.seedDefaultBrewingMethods()
             try await databaseService.seedDefaultCoffeeBeans(createdBy: user.uid)
+            try await databaseService.seedDefaultEquipment(createdBy: user.uid)
             
             self.currentUser = user
             self.isAuthenticated = true
@@ -99,7 +117,8 @@ class AuthenticationService: ObservableObject {
             let user = User(
                 uid: result.user.uid,
                 email: email,
-                displayName: displayName
+                displayName: displayName,
+                username: nil // Will auto-generate from displayName
             )
             
             try await databaseService.createUser(user)
@@ -107,6 +126,7 @@ class AuthenticationService: ObservableObject {
             // Seed default data
             try await databaseService.seedDefaultBrewingMethods()
             try await databaseService.seedDefaultCoffeeBeans(createdBy: result.user.uid)
+            try await databaseService.seedDefaultEquipment(createdBy: result.user.uid)
             
             self.currentUser = user
             self.isAuthenticated = true
@@ -155,7 +175,7 @@ class AuthenticationService: ObservableObject {
         isLoading = false
     }
     
-    func updateProfile(displayName: String? = nil, bio: String? = nil, location: String? = nil, userTypes: [UserType]? = nil) async {
+    func updateProfile(displayName: String? = nil, username: String? = nil, bio: String? = nil, location: String? = nil, userTypes: [UserType]? = nil) async {
         guard var user = currentUser else { return }
         
         isLoading = true
@@ -171,6 +191,7 @@ class AuthenticationService: ObservableObject {
             }
             
             // Update other profile fields
+            if let username = username { user.username = username }
             if let bio = bio { user.bio = bio }
             if let location = location { user.location = location }
             if let userTypes = userTypes { user.userTypes = userTypes }

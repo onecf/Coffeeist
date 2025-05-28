@@ -18,7 +18,7 @@ struct HomeView: View {
                             .font(.headline)
                             .foregroundStyle(.secondary)
                         
-                        Text("Good morning, \(authService.currentUser?.displayName ?? "Coffee Lover")!")
+                        Text("Good morning, \(authService.currentUser?.displayName.components(separatedBy: " ").first ?? "Coffee Lover")!")
                             .font(.largeTitle)
                             .fontWeight(.bold)
                     }

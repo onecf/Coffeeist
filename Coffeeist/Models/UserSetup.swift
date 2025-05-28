@@ -5,7 +5,7 @@ struct UserSetup: Identifiable, Codable {
     @DocumentID var id: String?
     var userId: String
     var name: String
-    var brewingMethodId: String // Reference to brewing_methods
+    var brewingMethodId: String? // Optional reference to brewing_methods
     var equipmentIds: SetupEquipment
     var isDefault: Bool
     var isPublic: Bool
@@ -15,7 +15,7 @@ struct UserSetup: Identifiable, Codable {
     init(
         userId: String,
         name: String,
-        brewingMethodId: String,
+        brewingMethodId: String? = nil,
         equipmentIds: SetupEquipment = SetupEquipment(),
         isDefault: Bool = false,
         isPublic: Bool = false,

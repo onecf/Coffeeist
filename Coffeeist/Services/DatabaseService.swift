@@ -298,21 +298,132 @@ class DatabaseService: ObservableObject {
     
     // MARK: - Data Seeding
     func seedDefaultBrewingMethods() async throws {
+        print("🌱 Checking if brewing methods need seeding...")
         let existingMethods = try await getBrewingMethods()
+        print("📊 Found \(existingMethods.count) existing brewing methods")
+        
         if existingMethods.isEmpty {
+            print("🌱 Seeding default brewing methods...")
             for method in BrewingMethod.defaultMethods {
-                _ = try await createBrewingMethod(method)
+                let methodId = try await createBrewingMethod(method)
+                print("✅ Created brewing method: \(method.name) with ID: \(methodId)")
+            }
+            print("✅ Finished seeding brewing methods")
+        } else {
+            print("ℹ️ Brewing methods already exist, skipping seeding")
+            
+            // Check for missing methods and add only those
+            let existingNames = Set(existingMethods.map { $0.name })
+            let missingMethods = BrewingMethod.defaultMethods.filter { !existingNames.contains($0.name) }
+            
+            if !missingMethods.isEmpty {
+                print("🌱 Adding \(missingMethods.count) missing brewing methods...")
+                for method in missingMethods {
+                    let methodId = try await createBrewingMethod(method)
+                    print("✅ Added missing brewing method: \(method.name) with ID: \(methodId)")
+                }
             }
         }
     }
     
     func seedDefaultCoffeeBeans(createdBy: String) async throws {
-        let existingBeans = try await getCoffeeBeans(limit: 10)
+        print("🌱 Checking if coffee beans need seeding...")
+        let existingBeans = try await getCoffeeBeans(limit: 100)
+        print("📊 Found \(existingBeans.count) existing coffee beans")
+        
         if existingBeans.isEmpty {
-            for bean in CoffeeBean.defaultBeans(createdBy: createdBy) {
-                _ = try await createCoffeeBean(bean)
+            print("🌱 Seeding default coffee beans...")
+            let defaultBeans = CoffeeBean.defaultBeans(createdBy: createdBy)
+            print("📦 Will create \(defaultBeans.count) coffee beans")
+            
+            for bean in defaultBeans {
+                let beanId = try await createCoffeeBean(bean)
+                print("✅ Created coffee bean: \(bean.brand) \(bean.name) with ID: \(beanId)")
+            }
+            print("✅ Finished seeding coffee beans")
+        } else {
+            print("ℹ️ Coffee beans already exist, checking for missing ones...")
+            
+            // Check for missing beans by brand + name combination
+            let existingBeanKeys = Set(existingBeans.map { "\($0.brand)|\($0.name)" })
+            let defaultBeans = CoffeeBean.defaultBeans(createdBy: createdBy)
+            let missingBeans = defaultBeans.filter { !existingBeanKeys.contains("\($0.brand)|\($0.name)") }
+            
+            if !missingBeans.isEmpty {
+                print("🌱 Adding \(missingBeans.count) missing coffee beans...")
+                for bean in missingBeans {
+                    let beanId = try await createCoffeeBean(bean)
+                    print("✅ Added missing coffee bean: \(bean.brand) \(bean.name) with ID: \(beanId)")
+                }
+            } else {
+                print("ℹ️ All default coffee beans already exist")
             }
         }
+    }
+    
+    func seedDefaultEquipment(createdBy: String) async throws {
+        print("🌱 Checking if equipment needs seeding...")
+        let existingEquipment = try await getEquipment(limit: 100)
+        print("📊 Found \(existingEquipment.count) existing equipment items")
+        
+        if existingEquipment.isEmpty {
+            print("🌱 Seeding default equipment...")
+            let defaultEquipment = Equipment.defaultEquipment(createdBy: createdBy)
+            print("📦 Will create \(defaultEquipment.count) equipment items")
+            
+            for equipment in defaultEquipment {
+                let equipmentId = try await createEquipment(equipment)
+                print("✅ Created equipment: \(equipment.brand) \(equipment.model) with ID: \(equipmentId)")
+            }
+            print("✅ Finished seeding equipment")
+        } else {
+            print("ℹ️ Equipment already exists, checking for missing items...")
+            
+            // Check for missing equipment by brand + model combination
+            let existingEquipmentKeys = Set(existingEquipment.map { "\($0.brand)|\($0.model)" })
+            let defaultEquipment = Equipment.defaultEquipment(createdBy: createdBy)
+            let missingEquipment = defaultEquipment.filter { !existingEquipmentKeys.contains("\($0.brand)|\($0.model)") }
+            
+            if !missingEquipment.isEmpty {
+                print("🌱 Adding \(missingEquipment.count) missing equipment items...")
+                for equipment in missingEquipment {
+                    let equipmentId = try await createEquipment(equipment)
+                    print("✅ Added missing equipment: \(equipment.brand) \(equipment.model) with ID: \(equipmentId)")
+                }
+            } else {
+                print("ℹ️ All default equipment already exists")
+            }
+        }
+    }
+    
+    // MARK: - Force Seeding (for debugging)
+    func forceSeedAllData(createdBy: String) async throws {
+        print("🔄 Force seeding all data...")
+        
+        // Force seed brewing methods
+        print("🌱 Force seeding brewing methods...")
+        for method in BrewingMethod.defaultMethods {
+            let methodId = try await createBrewingMethod(method)
+            print("✅ Created brewing method: \(method.name) with ID: \(methodId)")
+        }
+        
+        // Force seed coffee beans
+        print("🌱 Force seeding coffee beans...")
+        let defaultBeans = CoffeeBean.defaultBeans(createdBy: createdBy)
+        for bean in defaultBeans {
+            let beanId = try await createCoffeeBean(bean)
+            print("✅ Created coffee bean: \(bean.brand) \(bean.name) with ID: \(beanId)")
+        }
+        
+        // Force seed equipment
+        print("🌱 Force seeding equipment...")
+        let defaultEquipment = Equipment.defaultEquipment(createdBy: createdBy)
+        for equipment in defaultEquipment {
+            let equipmentId = try await createEquipment(equipment)
+            print("✅ Created equipment: \(equipment.brand) \(equipment.model) with ID: \(equipmentId)")
+        }
+        
+        print("✅ Force seeding completed!")
     }
 }
 

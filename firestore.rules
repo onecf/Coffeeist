@@ -49,10 +49,12 @@ service cloud.firestore {
                        resource.data.createdBy == request.auth.uid;
     }
     
-    // Brewing methods - read-only for users (admin-managed)
+    // Brewing methods - read-only for users, but allow creation during seeding
     match /brewing_methods/{methodId} {
       allow read: if isAuthenticated();
-      allow write: if false; // Admin-only via server SDK
+      allow create: if isAuthenticated() && 
+                       request.resource.data.keys().hasAll(['name', 'description', 'category']);
+      allow update, delete: if false; // Admin-only via server SDK
     }
     
     // User setups - users can manage their own, read public ones

@@ -116,6 +116,7 @@ enum ProcessingMethod: String, CaseIterable, Codable {
 extension CoffeeBean {
     static func defaultBeans(createdBy: String) -> [CoffeeBean] {
         return [
+            // MARK: - Specialty Coffee Roasters
             CoffeeBean(
                 brand: "Blue Bottle",
                 name: "Giant Steps",
@@ -178,6 +179,177 @@ extension CoffeeBean {
                 price: 19.50,
                 averageRating: 4.7,
                 ratingCount: 78,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            
+            // MARK: - Starbucks Whole Bean Coffees
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "Pike Place Roast",
+                origin: "Latin America",
+                roastLevel: .medium,
+                processingMethod: .washed,
+                tastingNotes: ["Smooth", "Balanced", "Rich"],
+                price: 12.95,
+                averageRating: 4.1,
+                ratingCount: 1250,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "House Blend",
+                origin: "Latin America",
+                roastLevel: .medium,
+                processingMethod: .washed,
+                tastingNotes: ["Lively", "Balanced", "Nutty"],
+                price: 12.95,
+                averageRating: 4.0,
+                ratingCount: 980,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "Breakfast Blend",
+                origin: "Latin America",
+                roastLevel: .medium,
+                processingMethod: .washed,
+                tastingNotes: ["Bright", "Tangy", "Crisp"],
+                price: 12.95,
+                averageRating: 4.2,
+                ratingCount: 756,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "Veranda Blend",
+                origin: "Latin America",
+                roastLevel: .light,
+                processingMethod: .washed,
+                tastingNotes: ["Mellow", "Soft", "Approachable"],
+                price: 12.95,
+                averageRating: 3.9,
+                ratingCount: 634,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "French Roast",
+                origin: "Multi-region",
+                roastLevel: .dark,
+                processingMethod: .washed,
+                tastingNotes: ["Intense", "Smoky", "Bold"],
+                price: 12.95,
+                averageRating: 4.3,
+                ratingCount: 1120,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "Italian Roast",
+                origin: "Multi-region",
+                roastLevel: .dark,
+                processingMethod: .washed,
+                tastingNotes: ["Rich", "Deep", "Caramelized"],
+                price: 12.95,
+                averageRating: 4.1,
+                ratingCount: 892,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "Espresso Roast",
+                origin: "Multi-region",
+                roastLevel: .dark,
+                processingMethod: .washed,
+                tastingNotes: ["Rich", "Caramelly", "Sweet"],
+                price: 12.95,
+                averageRating: 4.4,
+                ratingCount: 1456,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "Sumatra",
+                origin: "Indonesia",
+                roastLevel: .dark,
+                processingMethod: .natural,
+                tastingNotes: ["Earthy", "Herbal", "Full-bodied"],
+                price: 13.95,
+                averageRating: 4.2,
+                ratingCount: 567,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "Guatemala Antigua",
+                origin: "Guatemala",
+                roastLevel: .medium,
+                processingMethod: .washed,
+                tastingNotes: ["Spicy", "Smoky", "Full-bodied"],
+                price: 13.95,
+                averageRating: 4.3,
+                ratingCount: 423,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "Kenya",
+                origin: "Kenya",
+                roastLevel: .medium,
+                processingMethod: .washed,
+                tastingNotes: ["Wine-like", "Black currant", "Bright"],
+                price: 13.95,
+                averageRating: 4.5,
+                ratingCount: 345,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "Ethiopia",
+                origin: "Ethiopia",
+                roastLevel: .medium,
+                processingMethod: .washed,
+                tastingNotes: ["Bright", "Floral", "Citrusy"],
+                price: 13.95,
+                averageRating: 4.4,
+                ratingCount: 289,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "Colombia",
+                origin: "Colombia",
+                roastLevel: .medium,
+                processingMethod: .washed,
+                tastingNotes: ["Balanced", "Nutty", "Cocoa"],
+                price: 13.95,
+                averageRating: 4.2,
+                ratingCount: 512,
+                createdBy: createdBy,
+                isVerified: true
+            ),
+            CoffeeBean(
+                brand: "Starbucks",
+                name: "Blonde Espresso Roast",
+                origin: "Latin America & East Africa",
+                roastLevel: .light,
+                processingMethod: .washed,
+                tastingNotes: ["Sweet", "Smooth", "Balanced"],
+                price: 12.95,
+                averageRating: 4.0,
+                ratingCount: 678,
                 createdBy: createdBy,
                 isVerified: true
             )

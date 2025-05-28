@@ -24,6 +24,10 @@ struct ProfileView: View {
                             Text(authService.currentUser?.displayName ?? "Unknown User")
                                 .font(.headline)
                             
+                            Text("@\(authService.currentUser?.username ?? "coffee_lover")")
+                                .font(.subheadline)
+                                .foregroundColor(.brown)
+                            
                             Text(authService.currentUser?.email ?? "")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
@@ -106,6 +110,7 @@ struct EditProfileView: View {
     @Environment(\.dismiss) private var dismiss
     
     @State private var displayName: String = ""
+    @State private var username: String = ""
     @State private var bio: String = ""
     @State private var location: String = ""
     @State private var isSaving = false
@@ -115,6 +120,15 @@ struct EditProfileView: View {
             Form {
                 Section("Profile Information") {
                     TextField("Display Name", text: $displayName)
+                    
+                    HStack {
+                        Text("@")
+                            .foregroundColor(.brown)
+                        TextField("username", text: $username)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                    }
+                    
                     TextField("Bio", text: $bio, axis: .vertical)
                         .lineLimit(3...6)
                     TextField("Location", text: $location)
@@ -147,6 +161,7 @@ struct EditProfileView: View {
     private func loadCurrentProfile() {
         if let user = authService.currentUser {
             displayName = user.displayName
+            username = user.username
             bio = user.bio ?? ""
             location = user.location ?? ""
         }
@@ -157,6 +172,7 @@ struct EditProfileView: View {
         
         await authService.updateProfile(
             displayName: displayName.isEmpty ? nil : displayName,
+            username: username.isEmpty ? nil : username,
             bio: bio.isEmpty ? nil : bio,
             location: location.isEmpty ? nil : location
         )

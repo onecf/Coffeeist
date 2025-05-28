@@ -13,6 +13,7 @@ User profiles and authentication data.
   "uid": "string (Firebase Auth UID)",
   "email": "string",
   "displayName": "string",
+  "username": "string (unique social handle)",
   "profileImageURL": "string (optional)",
   "bio": "string (optional)",
   "location": "string (optional)",

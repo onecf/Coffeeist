@@ -20,25 +20,38 @@ struct PreparationTimelineCard: View {
     @EnvironmentObject private var databaseService: DatabaseService
     @State private var coffeeBean: CoffeeBean?
     @State private var brewingMethod: BrewingMethod?
+    @State private var user: User?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Header with date and rating
+            // User header (like Strava)
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(preparation.date, style: .date)
+                // Profile picture placeholder
+                Circle()
+                    .fill(Color.brown.opacity(0.2))
+                    .frame(width: 40, height: 40)
+                    .overlay(
+                        Text(user?.username.prefix(1).uppercased() ?? "C")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundColor(.brown)
+                    )
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("@\(user?.username ?? "coffee_lover")")
                         .font(.headline)
                         .fontWeight(.semibold)
                     
-                    Text(preparation.date, style: .time)
+                    Text(timeAgoString(from: preparation.date))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 
                 Spacer()
                 
-                VStack(alignment: .trailing, spacing: 4) {
-                    HStack(spacing: 4) {
+                // Rating
+                VStack(alignment: .trailing, spacing: 2) {
+                    HStack(spacing: 2) {
                         ForEach(0..<5) { index in
                             Image(systemName: index < preparation.preparationRating / 2 ? "star.fill" : "star")
                                 .foregroundColor(.yellow)
@@ -47,7 +60,7 @@ struct PreparationTimelineCard: View {
                     }
                     
                     Text("\(preparation.preparationRating)/10")
-                        .font(.caption)
+                        .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
             }
@@ -56,11 +69,11 @@ struct PreparationTimelineCard: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     if let coffeeBean = coffeeBean {
-                        Text(coffeeBean.brand)
+                        Text("\(coffeeBean.brand) \(coffeeBean.name)")
                             .font(.subheadline)
                             .fontWeight(.medium)
                         
-                        Text("\(coffeeBean.origin) • \(coffeeBean.roastLevel)")
+                        Text("\(coffeeBean.origin) • \(coffeeBean.roastLevel.displayName)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -100,18 +113,67 @@ struct PreparationTimelineCard: View {
                 )
                 
                 Spacer()
+                
+                // Ratio calculation
+                if let dose = Double(preparation.measurements.groundCoffeeWeight),
+                   let yield = Double(preparation.measurements.yieldWeight),
+                   dose > 0 {
+                    let ratio = yield / dose
+                    Text("1:\(String(format: "%.1f", ratio))")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(6)
+                }
             }
             
             // Notes (if any)
             if !preparation.notes.isEmpty {
                 Text(preparation.notes)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
+                    .font(.callout)
+                    .foregroundStyle(.primary)
+                    .lineLimit(3)
+                    .padding(.top, 4)
             }
             
             // Characteristics preview
             CharacteristicsPreview(characteristics: preparation.characteristics)
+            
+            // Interaction buttons (like social media)
+            HStack {
+                Button(action: {}) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "heart")
+                        Text("Like")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                }
+                
+                Button(action: {}) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "message")
+                        Text("Comment")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                if preparation.isPublic {
+                    Image(systemName: "globe")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else {
+                    Image(systemName: "lock")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .padding(.top, 8)
         }
         .padding()
         .background(Color(.systemBackground))
@@ -126,11 +188,35 @@ struct PreparationTimelineCard: View {
         do {
             async let coffeeTask = databaseService.getCoffeeBean(id: preparation.coffeeBeanId)
             async let brewingTask = databaseService.getBrewingMethod(id: preparation.brewingMethodId)
+            async let userTask = databaseService.getUser(uid: preparation.userId)
             
             self.coffeeBean = try await coffeeTask
             self.brewingMethod = try await brewingTask
+            self.user = try await userTask
         } catch {
             print("Error loading related data: \(error)")
+        }
+    }
+    
+    private func timeAgoString(from date: Date) -> String {
+        let now = Date()
+        let timeInterval = now.timeIntervalSince(date)
+        
+        if timeInterval < 60 {
+            return "Just now"
+        } else if timeInterval < 3600 {
+            let minutes = Int(timeInterval / 60)
+            return "\(minutes)m ago"
+        } else if timeInterval < 86400 {
+            let hours = Int(timeInterval / 3600)
+            return "\(hours)h ago"
+        } else if timeInterval < 604800 {
+            let days = Int(timeInterval / 86400)
+            return "\(days)d ago"
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            return formatter.string(from: date)
         }
     }
 }
