@@ -255,6 +255,155 @@ class DatabaseService: ObservableObject {
         try await db.collection("preparations").document(id).delete()
     }
     
+    // Get coffee beans that have been used in user's preparations
+    func getUsedCoffeeBeans(userId: String) async throws -> [CoffeeBean] {
+        print("☕ DatabaseService: Getting coffee beans used by user \(userId)...")
+        
+        // First, get all preparations for the user
+        let preparationsSnapshot = try await db.collection("preparations")
+            .whereField("userId", isEqualTo: userId)
+            .getDocuments()
+        
+        // Extract unique coffee bean IDs from preparations
+        let coffeeBeanIds = Set<String>(preparationsSnapshot.documents.compactMap { document in
+            guard let preparation = try? document.data(as: Preparation.self) else { return nil }
+            return preparation.coffeeBeanId
+        })
+        
+        print("☕ DatabaseService: Found \(coffeeBeanIds.count) unique coffee beans used in preparations")
+        
+        // If no coffee beans found, return empty array
+        guard !coffeeBeanIds.isEmpty else {
+            return []
+        }
+        
+        // Fetch the actual coffee bean documents
+        // Firestore 'in' queries are limited to 10 items, so we need to batch if more than 10
+        let batchSize = 10
+        let batchedIds = Array(coffeeBeanIds).chunked(into: batchSize)
+        
+        var allBeans: [CoffeeBean] = []
+        
+        for batch in batchedIds {
+            let snapshot = try await db.collection("coffee_beans")
+                .whereField(FieldPath.documentID(), in: Array(batch))
+                .getDocuments()
+            
+            let beans = try snapshot.documents.compactMap { try $0.data(as: CoffeeBean.self) }
+            allBeans.append(contentsOf: beans)
+        }
+        
+        print("☕ DatabaseService: Successfully loaded \(allBeans.count) used coffee beans")
+        return allBeans.sorted { $0.brand < $1.brand }
+    }
+    
+    // Get equipment that have been used in user's preparations
+    func getUsedEquipment(userId: String) async throws -> [Equipment] {
+        print("⚙️ DatabaseService: Getting equipment used by user \(userId)...")
+        
+        // First, get all preparations for the user
+        let preparationsSnapshot = try await db.collection("preparations")
+            .whereField("userId", isEqualTo: userId)
+            .getDocuments()
+        
+        print("⚙️ DatabaseService: Found \(preparationsSnapshot.documents.count) preparations for user")
+        
+        // Extract unique equipment IDs from preparations
+        var allEquipmentIds = Set<String>()
+        var setupsFound = 0
+        var setupsWithoutId = 0
+        
+        for document in preparationsSnapshot.documents {
+            guard let preparation = try? document.data(as: Preparation.self) else { continue }
+            
+            // Add equipment IDs from the setup used in this preparation
+            if let setupId = preparation.setupId {
+                // Get the setup to extract equipment IDs
+                do {
+                    let setupDoc = try await db.collection("user_setups").document(setupId).getDocument()
+                    if let setup = try? setupDoc.data(as: UserSetup.self) {
+                        setupsFound += 1
+                        var equipmentCountInSetup = 0
+                        
+                        // Add all equipment IDs from the setup
+                        if let espressoMachineId = setup.equipmentIds.espressoMachine {
+                            allEquipmentIds.insert(espressoMachineId)
+                            equipmentCountInSetup += 1
+                        }
+                        if let grinderId = setup.equipmentIds.grinder {
+                            allEquipmentIds.insert(grinderId)
+                            equipmentCountInSetup += 1
+                        }
+                        if let portafilterId = setup.equipmentIds.portafilter {
+                            allEquipmentIds.insert(portafilterId)
+                            equipmentCountInSetup += 1
+                        }
+                        if let scaleId = setup.equipmentIds.scale {
+                            allEquipmentIds.insert(scaleId)
+                            equipmentCountInSetup += 1
+                        }
+                        if let kettleId = setup.equipmentIds.kettle {
+                            allEquipmentIds.insert(kettleId)
+                            equipmentCountInSetup += 1
+                        }
+                        if let dripperId = setup.equipmentIds.dripper {
+                            allEquipmentIds.insert(dripperId)
+                            equipmentCountInSetup += 1
+                        }
+                        
+                        print("⚙️ Setup \(setupId) has \(equipmentCountInSetup) equipment items")
+                    } else {
+                        print("⚠️ Could not decode setup \(setupId) as UserSetup")
+                    }
+                } catch {
+                    print("⚠️ Error fetching setup \(setupId): \(error)")
+                }
+            } else {
+                print("⚠️ Preparation \(preparation.id ?? "unknown") has no setupId")
+                setupsWithoutId += 1
+            }
+        }
+        
+        print("⚙️ DatabaseService: Processed \(setupsFound) setups, \(setupsWithoutId) preparations without setupId")
+        print("⚙️ DatabaseService: Found \(allEquipmentIds.count) unique equipment IDs: \(Array(allEquipmentIds))")
+        
+        // If no equipment IDs found, return empty array
+        if allEquipmentIds.isEmpty {
+            print("⚙️ DatabaseService: No equipment found in user preparations")
+            return []
+        }
+        
+        // Fetch the actual equipment documents
+        // Firestore 'in' queries are limited to 10 items, so we need to batch if more than 10
+        let batchSize = 10
+        let batchedIds = Array(allEquipmentIds).chunked(into: batchSize)
+        
+        var allEquipment: [Equipment] = []
+        
+        for batch in batchedIds {
+            let batchSnapshot = try await db.collection("equipment")
+                .whereField(FieldPath.documentID(), in: batch)
+                .getDocuments()
+            
+            let batchEquipment = batchSnapshot.documents.compactMap { document in
+                try? document.data(as: Equipment.self)
+            }
+            
+            allEquipment.append(contentsOf: batchEquipment)
+        }
+        
+        // Sort alphabetically by brand and model
+        let sortedEquipment = allEquipment.sorted { first, second in
+            if first.brand == second.brand {
+                return first.model < second.model
+            }
+            return first.brand < second.brand
+        }
+        
+        print("⚙️ DatabaseService: Successfully retrieved \(sortedEquipment.count) used equipment items")
+        return sortedEquipment
+    }
+    
     // MARK: - Community Features
     func followUser(follower: String, following: String) async throws {
         let follow = Follow(follower: follower, following: following)
@@ -440,6 +589,15 @@ enum DatabaseError: Error {
             return "User not found"
         case .unauthorized:
             return "Unauthorized access"
+        }
+    }
+}
+
+// Extension to chunk arrays for batch processing
+extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0..<Swift.min($0 + size, count)])
         }
     }
 } 
